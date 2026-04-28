@@ -3,4 +3,14 @@ name = "affine"
 version = "0.1.0"
 edition = "2024"
 
+[workspace]
+members = ["model"]
+
+[workspace.dependencies]
+candle-core = { git = "https://github.com/huggingface/candle", version = "0.10" }
+candle-nn = { git = "https://github.com/huggingface/candle", version = "0.10" }
+candle-transformers = { git = "https://github.com/huggingface/candle", version = "^0.10" }
+hf-hub = "0.3"
+tokenizers = "0.21"
+
 [dependencies]
