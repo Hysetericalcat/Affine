@@ -5,19 +5,19 @@ use candle_nn::ops::gelu;
 
 
 struct MLP {
-    fc1: Linear,
-    fc2: Linear,
+    pub fc1: Linear,
+    pub fc2: Linear,
 }
 
 //Larger d_model means each token's vector has more dimensions — more room to encode distinct features simultaneously.
 impl MLP {
-    fn new(d_model: usize, vb: VarBuilder) -> Result<Self> {
+    pub fn new(d_model: usize, vb: VarBuilder) -> Result<Self> {
         let fc1 = linear(d_model, 4 * d_model, vb.pp("fc1"))?;
         let fc2 = linear(4 * d_model, d_model, vb.pp("fc2"))?;
         Ok(Self { fc1, fc2 })
     }
 
-    fn forward(&self,x:&Tensor)->Result<Tensor>{
+    pub fn forward(&self,x:&Tensor)->Result<Tensor>{
         //let x = gelu(&x)?;
         let x = self.fc1.forward(x)?;
         let x = gelu(x)?;   

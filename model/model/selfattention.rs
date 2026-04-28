@@ -5,23 +5,23 @@ use candle_nn::ops::softmax;
 use candle_core::Tensor;
 
 struct CausalSelfAttention{
-    wq: Linear,
-    wk: Linear,
-    wv: Linear
+    pub wq: Linear,
+    pub wk: Linear,
+    pub wv: Linear
 }
 
 //usize -> flexible
 //n_seq*dim = n_seq*dim.dim*dim 
 //so dim*dim = w
 impl CausalSelfAttention{
-    fn new(d_model:usize,vb: VarBuilder)->Result<Self>{
+    pub fn new(d_model:usize,vb: VarBuilder)->Result<Self>{
         let wq = linear(d_model,d_model,vb)?;
         let wk = linear(d_model,d_model,vb)?;
         let wv = linear(d_model,d_model,vb)?;
         Ok(Self {wq,wk,wv})
     }
 
-    fn forward(&self,x:&Tensor,d_head:usize)->Result<Tensor>{
+    pub fn forward(&self,x:&Tensor,d_head:usize)->Result<Tensor>{
        let Q = self.wq.forward(&x)?;
        let K = self.wk.forward(&x)?;
        let V = self.wv.forward(&x)?;
