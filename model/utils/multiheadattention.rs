@@ -4,7 +4,7 @@ mod causal_self_attention;
 use causal_self_attention::CausalSelfAttention;
 
 
-pub struct MultiHeadAttention {
+struct MultiHeadAttention {
     heads: Vec<CausalSelfAttention>,
     wo: Linear,
 }
