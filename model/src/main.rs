@@ -28,7 +28,8 @@ fn main()-> Result<(), Box<dyn std::error::Error>> {
      let ids: Vec<u32> = encoding.get_ids().to_vec();
      let seq_len = ids.len();
      let input = Tensor::from_vec(ids, (1, seq_len), &device)?;
-     let logits = model.forward(&input, 768)?;
+     let (logits,residual_streams) = model.forward(&input, 768)?;
      println!("{:?}", logits.shape());
+     println!("{:?}", residual_streams.len());
      Ok(())
 }

@@ -31,15 +31,19 @@ impl GPT2 {
         Ok(Self {transformer_blocks,lm_head,embeddings,ln_f})
     }
 
-    pub fn forward(&self,token_ids:&Tensor,d_model:usize) -> Result<Tensor>{
+    pub fn forward(&self,token_ids:&Tensor,d_model:usize) -> Result<(Tensor, Vec<Tensor>)>{
+        let mut residual_streams = vec![];
         let mut x = self.embeddings.forward(token_ids)?; // accesible outside for loop too,SCOPE doesn't ends after the loop
         //nothing to do with ownership
+        residual_streams.push(x.clone());
         for block in &self.transformer_blocks{
-            x = block.forward(&x,d_model)?;  //& -> do not provide ownership of local var.
+            x = block.forward(&x,d_model)?;
+            residual_streams.push(x.clone()); 
+            //If you pushed a reference to x, that reference would point to whatever x becomes next iteration, not what it was when pushed.
             //each block handling its own residual stream
         }
         let x = self.ln_f.forward(&x)?;
         let logits = self.lm_head.forward(&x)?;
-        Ok(logits)
+        Ok((logits, residual_streams))
     }
 }
