@@ -3,7 +3,8 @@ use candle_core::{Tensor, Result};
 mod causal_self_attention;
 use causal_self_attention::CausalSelfAttention;
 
-struct MultiHeadAttention {
+
+pub struct MultiHeadAttention {
     heads: Vec<CausalSelfAttention>,
     wo: Linear,
 }
