@@ -4,13 +4,13 @@ mod causal_self_attention;
 use causal_self_attention::CausalSelfAttention;
 
 
-struct MultiHeadAttention {
-    heads: Vec<CausalSelfAttention>,
-    wo: Linear,
+pub struct MultiHeadAttention {
+    pub heads: Vec<CausalSelfAttention>,
+    pub wo: Linear,
 }
 
 impl MultiHeadAttention {
-    fn new(d_model: usize, n_head: usize, vb: VarBuilder) -> Result<Self> {
+    pub fn new(d_model: usize, n_head: usize, vb: VarBuilder) -> Result<Self> {
         let d_head = d_model / n_head;
         let mut heads = vec![];
         for i in 0..n_head {
@@ -21,7 +21,7 @@ impl MultiHeadAttention {
         Ok(Self { heads, wo })
     }
 
-    fn forward(&self, x: &Tensor, d_model: usize) -> Result<Tensor> {
+    pub fn forward(&self, x: &Tensor, d_model: usize) -> Result<Tensor> {
         let d_head = d_model / self.heads.len();
         let mut scores = vec![];
         for head in &self.heads {

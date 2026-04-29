@@ -6,11 +6,11 @@ use candle_nn::{linear, Linear, VarBuilder};
 // Unembedding: projects residual stream [seq_len x 768] -> vocab scores [seq_len x 50257]
 // Highest score at each position = most likely next token
 
-struct GPT2 {
-    embeddings: Embeddings,
-    transformer_blocks: Vec<TransformerBlock>,
-    ln_f: LayerNorm,
-    lm_head: Linear,
+pub struct GPT2 {
+    pub embeddings: Embeddings,
+    pub transformer_blocks: Vec<TransformerBlock>,
+    pub ln_f: LayerNorm,
+    pub lm_head: Linear,
 }
 
 

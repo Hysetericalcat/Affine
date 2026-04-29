@@ -4,7 +4,7 @@ use candle_nn::{embedding, Embedding, VarBuilder};
 use candle_nn::ops::gelu;
 
 
-struct MLP {
+pub struct MLP {
     pub fc1: Linear,
     pub fc2: Linear,
 }
