@@ -1,7 +1,9 @@
-use candle_nn::{linear_no_bias};
+use candle_nn::linear_no_bias;
 use candle_core::{Tensor, Result};
-use transformerblock::TransformerBlock;
-use candle_nn::{linear, Linear, VarBuilder};
+use super::transformerblock::TransformerBlock;
+use candle_nn::{layer_norm, LayerNorm, Linear, Module, VarBuilder};
+use super::embeddings::Embeddings;
+
 
 // Unembedding: projects residual stream [seq_len x 768] -> vocab scores [seq_len x 50257]
 // Highest score at each position = most likely next token
@@ -16,14 +18,15 @@ pub struct GPT2 {
 
 impl GPT2 {
     pub fn new(d_model:usize,n_head:usize,vocab_size:usize,vb:VarBuilder) -> Result<Self>{
-        let embeddings = Embeddings::new(vocab_size, block_size, d_model, vb.pp("wte"))?;
+        let block_size = 1024;
+        let embeddings = Embeddings::new(vocab_size, block_size, d_model, vb.pp("wte"), vb.pp("wpe"))?;
         let mut transformer_blocks = vec![];
         for i in 0..12 {
-          let trasnsformerblock = TransformerBlock::new(d_model,n_head,vb.pp(format!("h.{}", i)));
+          let trasnsformerblock = TransformerBlock::new(d_model,n_head,vb.pp(format!("h.{}", i)))?;
           transformer_blocks.push(trasnsformerblock);
         }
-        
-        let lm_head = linear_no_bias(d_model, vocab_size, vb.pp("lm_head"))?;
+        let lm_head_w = vb.get((50257, 768), "wte.weight")?.t()?.contiguous()?;
+        let lm_head = candle_nn::Linear::new(lm_head_w, None);
         let ln_f = layer_norm(d_model, 1e-5, vb.pp("ln_f"))?;
         Ok(Self {transformer_blocks,lm_head,embeddings,ln_f})
     }
