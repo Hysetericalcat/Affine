@@ -17,7 +17,7 @@ impl Embeddings {
         let seq_len = token_ids.dim(1)?; //extract token ids from output of tokeniser.
         let positions = Tensor::arange(0u32, seq_len as u32, token_ids.device())?; //creates tensor of seq_len*token_ids
         let tok = self.token_emb.forward(token_ids)?;
-        let pos = self.pos_emb.forward(&positions)?; //position passed as reference becoz Tensor reuqires it
+        let pos = self.pos_emb.forward(&positions)?.unsqueeze(0)?; //[5,768] -> [1,5,768] to match tok
         tok + pos
     }
 }

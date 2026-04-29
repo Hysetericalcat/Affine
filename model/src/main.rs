@@ -1,6 +1,7 @@
 use hf_hub::api::sync::Api;
 use candle_nn::VarBuilder;
-use candle_core::DType;
+use candle_core::{DType, Tensor};
+use tokenizers::Tokenizer;
 mod utils {
     pub mod gpt2;
     pub mod transformerblock;
@@ -21,5 +22,13 @@ fn main()-> Result<(), Box<dyn std::error::Error>> {
         VarBuilder::from_mmaped_safetensors(&[weights_path], DType::F32, &device)? 
     };
     let model = GPT2::new(768, 12, 50257, vb)?;
-    Ok(())
+    let tokenizer_path = repo.get("tokenizer.json")?;
+    let tokenizer = Tokenizer::from_file(tokenizer_path).unwrap();
+    let encoding = tokenizer.encode("The cat sat on the", false).unwrap();
+     let ids: Vec<u32> = encoding.get_ids().to_vec();
+     let seq_len = ids.len();
+     let input = Tensor::from_vec(ids, (1, seq_len), &device)?;
+     let logits = model.forward(&input, 768)?;
+     println!("{:?}", logits.shape());
+     Ok(())
 }

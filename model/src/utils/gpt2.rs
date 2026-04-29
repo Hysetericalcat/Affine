@@ -25,7 +25,7 @@ impl GPT2 {
           let trasnsformerblock = TransformerBlock::new(d_model,n_head,vb.pp(format!("h.{}", i)))?;
           transformer_blocks.push(trasnsformerblock);
         }
-        let lm_head_w = vb.get((50257, 768), "wte.weight")?.t()?.contiguous()?;
+        let lm_head_w = vb.get((50257, 768), "wte.weight")?; // already [vocab, d_model] — no transpose needed (not Conv1D)
         let lm_head = candle_nn::Linear::new(lm_head_w, None);
         let ln_f = layer_norm(d_model, 1e-5, vb.pp("ln_f"))?;
         Ok(Self {transformer_blocks,lm_head,embeddings,ln_f})
