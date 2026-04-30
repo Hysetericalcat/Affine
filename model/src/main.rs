@@ -12,21 +12,11 @@ mod utils {
 }
 
 use utils::gpt2::GPT2;
-fn cosine_similarity(a: &Tensor, b: &Tensor) -> Result<f32> {
+fn cosine_similarity(a: &Tensor, b: &Tensor) -> Result<f32, Box<dyn std::error::Error>> {
     let dot = a.mul(b)?.sum_all()?.to_scalar::<f32>()?;
     let norm_a = a.mul(a)?.sum_all()?.sqrt()?.to_scalar::<f32>()?;
     let norm_b = b.mul(b)?.sum_all()?.sqrt()?.to_scalar::<f32>()?;
     Ok(dot / (norm_a * norm_b))
-}
-
-fn concatenate_by_label(label:&String,all_vectors:&Vec<(Vec<Vec<Tensor>>, &str)>)->Result<?Vec<Vec<Tensor>>>{
-     for vector in all_vectors{
-        let mut vectors = vec![];
-        if vector[1] == label{
-            vectors.push(vector[0])
-        }
-     }
-     Ok(?vectors)
 }
 
 fn main()-> Result<(), Box<dyn std::error::Error>> {
@@ -142,6 +132,15 @@ for layer in 0..n_layers {
         }
     }
 }
+//layer wise analysis
+    //vectors -> 13*756 matrices for the sentence.
+    //allvectors -> 50*13*756 matrices for all 50 sentences
+    for (vectors, label) in &all_vectors {
+        for i in 0..12 {
+            let sim = cosine_similarity(&vectors[i], &vectors[i+1])?;
+            println!("layer{} & layer{} similarity {}:",i,i+1,sim);
+        }
+    }
     println!("Processed {} sentences", all_vectors.len());
     Ok(())
 }
